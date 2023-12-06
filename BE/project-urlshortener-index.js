@@ -25,7 +25,6 @@ let originalShortUrls = {}
 
 app.post('/api/shorturl', (req, res) => {
   const url = req.body.url
-  const randomNumber = Math.floor(Math.random() * 100)
 
   if (!url.includes('https://') && !url.includes('http://')) {
     res.json({
@@ -34,23 +33,23 @@ app.post('/api/shorturl', (req, res) => {
   }
 
   if (!(url in originalShortUrls)) {
-    originalShortUrls[randomNumber] = url
+    originalShortUrls[url] = Math.floor(Math.random() * 100)
 
     return res.json({
       original_url: url,
-      short_url: randomNumber
+      short_url: originalShortUrls[url]
     })
   } else {
     return res.json({
       original_url: url,
-      short_url: randomNumber
+      short_url: originalShortUrls[url]
     })
   }
 })
 
 app.get('/api/shorturl/:shorturl', (req, res) => {
   const shorturl = parseInt(req.params.shorturl)
-  const originalurl = originalShortUrls[shorturl]
+  const originalurl = Object.keys(originalShortUrls).find(key => originalShortUrls[key] === shorturl)
 
   if (originalurl) {
     res.redirect(originalurl)
